@@ -1,0 +1,143 @@
+---
+title: "Proof: Gamma GLM and the Chain Ladder Method (Notation k) with Where Clause"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    number-sections: true
+    mainfont: "Segoe UI"
+    math: true
+---
+
+## 1. Original Problem Statement
+
+Consider the use of Generalized Linear Models (GLMs) for claims reserving when creating stochastic versions of the chain ladder model.
+
+We postulate a model with the following characteristics:
+
+1.  **Response Variable:** Gamma distributed.
+2.  **Covariates:** Development period is treated as a categorical variable (estimating a separate parameter for each lag).
+3.  **Link Function:** Inverse link function ($g(\mu) = 1/\mu$).
+4.  **Weights:** Claims reserved at the start of each development period (opening cumulative claims).
+
+**Hypothesis:**
+The coefficient values obtained from this GLM formulation are found to match $1/(\text{volume weighted values})$ obtained using the basic chain ladder method exactly. Similarly, the predicted values match the volume weighted chain ladder factors exactly.
+
+**Objective:**
+Construct a rigorous proof showing that this formulation provides an exact match for the volume weighted chain ladder development factor estimate.
+
+---
+
+## 2. Rigorous Proof (Using Index $k$)
+
+### 2.1 Definitions and Notation
+
+We focus on estimating the development factor for a single development period $j$, projecting claims from $j$ to $j+1$.
+
+* **Response Variable ($Y_k$):** The observed individual link ratio for origin period $k$.
+    $$Y_k = \frac{C_{k,j+1}}{C_{k,j}}$$
+* **Weights ($w_k$):** The opening cumulative claims for origin period $k$.
+    $$w_k = C_{k,j}$$
+* **Link Function (Inverse):**
+    $$g(\mu_k) = \frac{1}{\mu_k} = \eta_k$$
+* **Linear Predictor ($\eta_k$):**
+    $$\eta_k = \beta_j$$
+
+***
+
+#### Where Clause / Variable Glossary (Model Parameters)
+
+| Variable | Description | Role |
+| :---: | :--- | :--- |
+| $k$ | Origin period index (e.g., Accident Year) | Loop index, $k=1, \dots, n$ |
+| $j$ | Development period index (lag) | Categorical variable |
+| $C_{k,j}$ | **Cumulative claims** for origin $k$ and development $j$ | Core data |
+| $Y_k$ | **Response variable**; the individual link ratio $C_{k,j+1}/C_{k,j}$ | Observed data |
+| $w_k$ | **Weight variable**; the volume $C_{k,j}$ | Prior weights in the GLM |
+| $\mu_j$ | **Expected mean response** $E[Y_k]$; the estimated development factor $\hat{f}_j$ | Target mean to be estimated |
+| $\beta_j$ | **Regression coefficient** for lag $j$ | Model parameter (MLE target) |
+
+***
+
+### 2.2 The Gamma Log-Likelihood and Density Function
+
+The probability density function for a single observation $Y$ from the Exponential Dispersion Family is given by:
+
+$$f(y; \theta, \phi) = \exp\left( \frac{w(y\theta - b(\theta))}{\phi} + c(y, \phi) \right)$$
+
+***
+
+#### Where Clause / Variable Glossary (Gamma Density)
+
+| Variable | Description | Definition / Relation |
+| :---: | :--- | :--- |
+| $f(y; \theta, \phi)$ | **Probability Density Function** of the response variable $Y$ | The function being maximized |
+| $y$ | Observed value of the response variable $Y_k$ | Represents $C_{k,j+1}/C_{k,j}$ |
+| $w$ | **Prior Weight** (or scale weight) | $w$ is the volume $C_{k,j}$ |
+| $\theta$ | **Canonical Parameter** | $\theta = -1/\mu$ for Gamma |
+| $b(\theta)$ | **Cumulant Function** | $b(\theta) = -\ln(-\theta)$ for Gamma |
+| $\phi$ | **Dispersion Parameter** | Measures variance beyond the mean-variance relationship (constant across observations) |
+| $c(y, \phi)$ | **Normalizing Function** | Ensures the density integrates to 1 (ignored for MLE of $\beta_j$) |
+
+***
+
+For the Gamma distribution:
+* **Canonical Parameter:** $\theta = -1/\mu$
+* **Cumulant Function:** $b(\theta) = -\ln(-\theta)$
+
+### 2.3 Parameter Transformation
+
+We express the canonical parameter $\theta$ in terms of our regression coefficient $\beta_j$ using the inverse link function.
+
+Given the link $\frac{1}{\mu_j} = \beta_j$, we have:
+$$\mu_j = \frac{1}{\beta_j}$$
+
+Substituting this into the canonical parameter $\theta$:
+$$\theta = -\frac{1}{\mu_j} = -\beta_j$$
+
+Substituting into the cumulant function $b(\theta)$:
+$$b(\theta) = -\ln(-(-\beta_j)) = -\ln(\beta_j)$$
+
+### 2.4 Deriving the Score Equation
+
+The log-likelihood $l(\beta_j)$ for all observations in column $j$ is proportional to the sum of the inner term of the density function:
+
+$$l(\beta_j) \propto \sum_{k=1}^n w_k \left( Y_k \theta - b(\theta) \right)$$
+
+Substituting our expressions for $\theta$ and $b(\theta)$:
+
+$$l(\beta_j) \propto \sum_{k=1}^n w_k \left( Y_k (-\beta_j) - (-\ln(\beta_j)) \right)$$
+
+Simplifying and grouping terms based on the constant parameter $\beta_j$:
+
+$$l(\beta_j) \propto -\beta_j \sum_{k=1}^n w_k Y_k + \ln(\beta_j) \sum_{k=1}^n w_k$$
+
+To find the Maximum Likelihood Estimate (MLE), we differentiate with respect to $\beta_j$ and set the result to zero:
+
+$$\frac{\partial l}{\partial \beta_j} = -\sum_{k=1}^n w_k Y_k + \frac{1}{\beta_j} \sum_{k=1}^n w_k = 0$$
+
+### 2.5 Solving for the Estimator
+
+Rearranging the score equation to solve for the factor $\hat{\mu}_j = 1/\hat{\beta}_j$:
+
+$$\frac{1}{\hat{\beta}_j} \sum_{k=1}^n w_k = \sum_{k=1}^n w_k Y_k$$
+
+$$\hat{\mu}_j = \frac{\sum_{k=1}^n w_k Y_k}{\sum_{k=1}^n w_k}$$
+
+### 2.6 Final Substitution
+
+We substitute the definitions of $w_k$ and $Y_k$ back into the solution to match the Chain Ladder formula.
+
+**Numerator:**
+$$\sum_{k=1}^n w_k Y_k = \sum_{k=1}^n C_{k,j} \left( \frac{C_{k,j+1}}{C_{k,j}} \right) = \sum_{k=1}^n C_{k,j+1}$$
+
+**Denominator:**
+$$\sum_{k=1}^n w_k = \sum_{k=1}^n C_{k,j}$$
+
+**Conclusion:**
+The MLE for the mean $\hat{\mu}_j$ is:
+$$\hat{\mu}_j = \frac{\sum_{k=1}^n C_{k,j+1}}{\sum_{k=1}^n C_{k,j}}$$
+
+This is exactly the definition of the **Volume Weighted Chain Ladder** development factor.
+
+Q.E.D.

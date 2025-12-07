@@ -1,0 +1,83 @@
+---
+title: "The Relationship Between Standard and Exponential Dispersion Family (EDF) Gamma PDFs"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    number-sections: true
+    mainfont: "Segoe UI"
+    math: true
+    embed-resources: true
+---
+
+## 1. Context and Objective
+
+The rigorous proof of the GLM/Chain Ladder equivalence relied on the **Exponential Dispersion Family (EDF)** form of the Gamma probability density function (PDF). This section demonstrates the algebraic connection between the traditional **Standard Gamma PDF** (which uses the $\Gamma$ function) and the EDF form, explicitly identifying the canonical parameters ($\theta$ and $b(\theta)$).
+
+### 1.1 The Two Forms of the Gamma PDF
+
+We aim to show the equivalence of the following two forms for the Gamma PDF:
+
+| Form | Equation | Key Parameters |
+| :--- | :--- | :--- |
+| **Standard PDF** | $$f(y; \alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)} y^{\alpha-1} e^{-\beta y}$$ | $\alpha$: Shape, $\beta$: Rate |
+| **EDF Form** (with weight $w=1$) | $$f(y; \theta, \phi) = \exp\left( \frac{y\theta - b(\theta)}{\phi} + c(y, \phi) \right)$$ | $\theta$: Canonical Parameter, $\phi$: Dispersion |
+
+---
+
+## 2. Parameter Mapping
+
+The transformation requires relating the standard parameters ($\alpha, \beta$) to the EDF parameters ($\mu, \theta, \phi$) using the properties of the Gamma distribution where the mean is $\mu = \alpha/\beta$ and the variance function is $V(\mu) = \mu^2$.
+
+| Standard Parameter ($\alpha, \beta$) | EDF Parameter ($\mu, \theta, \phi$) | Relationship |
+| :---: | :---: | :--- |
+| $\alpha$ (Shape) | $\phi$ (Dispersion) | $$\alpha = \frac{1}{\phi}$$ |
+| $\beta$ (Rate) | $\mu, \phi$ | $$\beta = \frac{\alpha}{\mu} = \frac{1}{\phi\mu}$$ |
+| $\mu$ (Mean) | $\theta$ (Canonical) | $$\theta = -\frac{1}{\mu}$$ |
+
+Using these relationships, we can express the rate $\beta$ entirely in terms of the EDF parameters $\theta$ and $\phi$:
+$$\beta = \frac{1}{\phi} \cdot \frac{1}{\mu} = \frac{1}{\phi} \cdot (-\theta) = -\frac{\theta}{\phi}$$
+
+---
+
+## 3. Transformation to EDF Form
+
+We begin with the Standard Gamma PDF and use the property that $X = \exp(\ln(X))$.
+
+$$f(y; \alpha, \beta) = \exp \left[ \ln \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{\alpha-1} e^{-\beta y} \right) \right]$$
+
+Applying logarithm properties, we separate the exponential term and group the constants:
+
+$$f(y; \alpha, \beta) = \exp \left[ -\beta y + \alpha \ln(\beta) - \ln(\Gamma(\alpha)) + (\alpha-1) \ln(y) \right]$$
+
+Now, we substitute the EDF parameter relationships ($\alpha = 1/\phi$ and $\beta = -\theta/\phi$):
+
+$$f(y; \theta, \phi) = \exp \left[ -\left(-\frac{\theta}{\phi}\right) y + \frac{1}{\phi} \ln\left(-\frac{\theta}{\phi}\right) - \ln\left(\Gamma\left(\frac{1}{\phi}\right)\right) + \left(\frac{1}{\phi}-1\right) \ln(y) \right]$$
+
+We simplify the first term and separate the second term using $\ln(a/b) = \ln(a) - \ln(b)$:
+
+$$f(y; \theta, \phi) = \exp \left[ \frac{y\theta}{\phi} + \frac{1}{\phi} \left( \ln(-\theta) - \ln(\phi) \right) - \ln\left(\Gamma\left(\frac{1}{\phi}\right)\right) + \left(\frac{1}{\phi}-1\right) \ln(y) \right]$$
+
+#### Final Grouping
+
+Recall that the **Cumulant Function** for the Gamma EDF is $b(\theta) = -\ln(-\theta)$, which implies $\ln(-\theta) = -b(\theta)$.
+
+Substituting $-b(\theta)$ into the equation allows us to match the EDF form exactly:
+
+$$f(y; \theta, \phi) = \exp \left[ \frac{y\theta}{\phi} + \frac{-b(\theta)}{\phi} - \frac{1}{\phi} \ln(\phi) - \ln\left(\Gamma\left(\frac{1}{\phi}\right)\right) + \left(\frac{1}{\phi}-1\right) \ln(y) \right]$$
+
+By separating the terms dependent on $\theta$ from the rest, we obtain the EDF structure:
+
+$$f(y; \theta, \phi) = \exp \left[ \underbrace{ \frac{y\theta - b(\theta)}{\phi} }_{\text{Term dependent on } \mu} + \underbrace{ -\frac{1}{\phi} \ln(\phi) - \ln\left(\Gamma\left(\frac{1}{\phi}\right)\right) + \left(\frac{1}{\phi}-1\right) \ln(y) }_{c(y, \phi)} \right]$$
+
+This confirms that the two PDF definitions are mathematically identical, with the EDF form separating the log-likelihood into a component containing the mean parameter ($\mu$, via $\theta$ and $b(\theta)$) and a component containing the constants ($c(y, \phi)$).
+
+---
+
+## 4. Role of the Weights ($w_k$) in the GLM
+
+In the stochastic claims reserving proof, the **EDF form was used with a weight $w_k = C_{k,j}$**:
+
+$$f(y; \theta, \phi) \propto \exp\left( \frac{w_k(y\theta - b(\theta))}{\phi} + c(y, \phi) \right)$$
+
+This weight $w_k$ effectively scales the dispersion, assuming that the variance of the observed individual link ratio $Y_k$ is inversely proportional to the volume $C_{k,j}$. This volume scaling is what ultimately forces the Maximum Likelihood Estimate (MLE) to recover the volume-weighted average (the Chain Ladder factor).

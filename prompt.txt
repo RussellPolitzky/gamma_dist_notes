@@ -2,13 +2,14 @@ Consider the use of GLMs for claims reserving when creating stochastic versions 
 
 When using:
 
-1.) a Gamma distributed response variable, and
-2.) development period as a categorical variable, so that the GLM finds a separate 1/(development factor) estimate for each development period 
-3.) the inverse link function with 
-4.) the claims reserved at the start of each development period as weights
+1.) A Gamma distributed response variable, and
+2.) Development period as a categorical variable, so that the GLM finds a separate 1/(development factor) 
+    estimate for each development period 
+3.) The inverse link function with 
+4.) The claims reserved at the start of each development period as weights
 
 The coefficient values obtained from the development factor samples using the GLM method as formulated 
-above, are found to match 1/(volume weighted values) obtained using the basic chain ladder method exactly.  
+above, are found to match 1/(volume weighted values), obtained using the basic chain ladder method, exactly.  
 Similarly, since the link function is the inverse function, the predicted values match the volume weighted
 values exactly.
 

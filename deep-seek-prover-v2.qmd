@@ -1,0 +1,111 @@
+---
+title: "Deep Seek Prover 2: BCL as Gamma GLM Proof"
+author: "DeepSeek Prover"
+format:
+  html:
+    toc: true
+    code-fold: true
+    code-tools: true
+---
+
+## 🧠 Deep Seek Prover 2: BCL as Gamma GLM Proof
+
+This document renders the output of the DeepSeek Prover 2 model, which provides a rigorous proof demonstrating the exact correspondence between the **Basic Chain Ladder (BCL)** method, specifically its volume-weighted development factors, and a carefully constructed **Generalized Linear Model (GLM)**.
+
+---
+
+### 📝 Proof Summary
+
+The core finding is that a GLM specified with the following components yields coefficient estimates that are the *reciprocals* of the volume-weighted chain ladder development factors ($F_j$). Furthermore, the predicted values from this GLM exactly match the BCL projections.
+
+| GLM Component | Specification |
+| :--- | :--- |
+| **Response Variable ($R_{i,j}$)** | Ratio of cumulative claims: $R_{i,j} = \frac{C_{i,j}}{C_{i,j-1}}$ |
+| **Distribution** | Gamma (for positivity and right-skewness) |
+| **Link Function** | Inverse: $E[R_{i,j}] = \frac{1}{\eta_{i,j}}$ |
+| **Linear Predictor ($\eta_{i,j}$)** | $\eta_{i,j} = \beta_j$ (categorical variable for development period $j$) |
+| **Weights ($w_{i,j}$)** | $w_{i,j} = C_{i,j-1}$ (cumulative claims at the start of period $j$) |
+
+---
+
+### 1. Understanding the Components
+
+* **Chain Ladder Method:** An actuarial technique for projecting unpaid claims, relying on historical development patterns to calculate **Development Factors ($F_j$)**. 
+    $$
+    F_j = \frac{\sum_{i} C_{i,j}}{\sum_{i} C_{i,j-1}}
+    $$
+    where $C_{i,j}$ is the cumulative claim for accident year $i$ at development period $j$. This formula yields the **volume-weighted** average of the link ratios $\frac{C_{i,j}}{C_{i,j-1}}$.
+
+* **Generalized Linear Models (GLMs):** A modeling framework for response variables with non-normal error distributions. It connects the expected value of the response to a linear predictor via a **link function**.
+
+* **Gamma Distribution:** Suitable for modeling continuous, positive, right-skewed data like claim ratios, where the variance is proportional to the square of the mean.
+
+---
+
+### 2. GLM Estimation and Correspondence
+
+#### GLM Setup
+
+The GLM is defined by the mean structure:
+$$
+E[R_{i,j}] = \mu_{i,j} = \frac{1}{\beta_j}
+$$
+
+The coefficient $\beta_j$ is estimated by maximizing the likelihood. For a GLM, this involves solving the **estimating equation** derived from the score function, which is equivalent to the weighted least squares equation for this specific model structure:
+$$
+\sum_{i} w_{i,j} \left( R_{i,j} - \mu_{i,j} \right) \frac{\partial \mu_{i,j}}{\partial \beta_j} = 0
+$$
+
+#### Derivation of $\beta_j$
+
+1.  **Substitute the GLM components:**
+    $$
+    \sum_{i} C_{i,j-1} \left( \frac{C_{i,j}}{C_{i,j-1}} - \frac{1}{\beta_j} \right) \frac{\partial}{\partial \beta_j} \left( \frac{1}{\beta_j} \right) = 0
+    $$
+
+2.  **Simplify the terms (the derivative $\frac{\partial}{\partial \beta_j} \left( \frac{1}{\beta_j} \right) = - \frac{1}{\beta_j^2}$ cancels out):**
+    $$
+    \sum_{i} C_{i,j-1} \left( \frac{C_{i,j}}{C_{i,j-1}} - \frac{1}{\beta_j} \right) = 0
+    $$
+
+3.  **Distribute the weight $C_{i,j-1}$:**
+    $$
+    \sum_{i} \left( C_{i,j} - \frac{C_{i,j-1}}{\beta_j} \right) = 0
+    $$
+
+4.  **Isolate $\beta_j$:**
+    $$
+    \sum_{i} C_{i,j} = \frac{1}{\beta_j} \sum_{i} C_{i,j-1}
+    $$
+    $$
+    \beta_j = \frac{\sum_{i} C_{i,j-1}}{\sum_{i} C_{i,j}}
+    $$
+
+#### Conclusion for Coefficients
+
+By definition of the volume-weighted chain ladder factor $F_j$:
+$$
+\beta_j = \frac{1}{F_j}
+$$
+
+The estimated GLM coefficient $\hat{\beta}_j$ is exactly the **reciprocal** of the volume-weighted development factor $F_j$.
+
+---
+
+### 3. Predicted Values Match BCL
+
+1.  **GLM Predicted Mean:** The predicted expected value for the ratio $R_{i,j}$ is:
+    $$
+    \hat{R}_{i,j} = E[R_{i,j}] = \frac{1}{\hat{\beta}_j} = F_j
+    $$
+
+2.  **GLM Predicted Cumulative Claim:** The GLM predicts the cumulative claim $\hat{C}_{i,j}$ based on the response variable definition:
+    $$
+    \hat{C}_{i,j} = C_{i,j-1} \cdot \hat{R}_{i,j}
+    $$
+    Substituting the predicted mean:
+    $$
+    \hat{C}_{i,j} = C_{i,j-1} \cdot F_j
+    $$
+
+This result **exactly matches** the standard Chain Ladder projection for cumulative claims, confirming the complete equivalence of the two methods under this specific GLM setup.

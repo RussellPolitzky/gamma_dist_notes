@@ -1,0 +1,145 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+
+\title{Proof: Equivalence of Gamma GLM and Volume-Weighted Chain Ladder}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+This document provides a rigorous proof that a Generalized Linear Model (GLM) configured with a Gamma error distribution, an inverse link function, and weights equal to the cumulative claims at the start of the development period yields parameter estimates that exactly match the standard volume-weighted Chain Ladder development factors.
+
+\section{Model Definitions and Notation}
+
+Let $C_{k,j}$ denote the cumulative claims for origin year $k$ and development period $j$. We define the incremental development factor (individual link ratio) as the response variable $Y_{k,j}$:
+\begin{equation} \label{eq:response}
+Y_{k,j} = \frac{C_{k,j+1}}{C_{k,j}}
+\end{equation}
+
+The standard volume-weighted Chain Ladder estimator for the age-to-age factor $f_j$ is given by:
+\begin{equation} \label{eq:cl_estimator}
+\hat{f}_j = \frac{\sum_{k \in \mathcal{S}_j} C_{k,j+1}}{\sum_{k \in \mathcal{S}_j} C_{k,j}}
+\end{equation}
+where $\mathcal{S}_j$ is the set of observed origin years for development period $j$.
+
+\section{GLM Specification}
+
+We construct a GLM with the following components:
+\begin{itemize}
+    \item \textbf{Distribution:} Gamma.
+    \item \textbf{Link Function:} Inverse.
+    \item \textbf{Predictors:} Development period $j$ is treated as a categorical factor.
+    \item \textbf{Weights:} Prior cumulative claims, $w_{k,j} = C_{k,j}$.
+\end{itemize}
+
+\subsection{The Linear Response}
+The linear response (or linear predictor), denoted as $\eta$, is modeled as a function of the development period only. Since development period is categorical, we assign a separate coefficient $\beta_j$ for each period:
+\begin{equation} \label{eq:linear_response}
+\eta_{k,j} = \beta_j
+\end{equation}
+
+\subsection{The Link Function}
+The link function $g(\cdot)$ connects the expected value of the response, $\mu_{k,j} = \mathrm{E}[Y_{k,j}]$, to the linear response $\eta_{k,j}$. For the inverse link:
+\begin{equation} \label{eq:link_func}
+\eta_{k,j} = g(\mu_{k,j}) = \frac{1}{\mu_{k,j}}
+\end{equation}
+
+Combining (\ref{eq:linear_response}) and (\ref{eq:link_func}), we can express the mean in terms of the coefficients:
+\begin{equation} \label{eq:mean_beta}
+\mu_{k,j} = \frac{1}{\beta_j}
+\end{equation}
+Note that $\mu_{k,j}$ depends only on $j$, so we may write $\mu_j$.
+
+\section{Gamma Distribution Parameterization}
+
+We utilize the Shape ($\alpha$) and Scale ($\theta$) parameterization of the Gamma probability density function. For a random variable $Y \sim \text{Gamma}(\alpha, \theta)$:
+\begin{equation} \label{eq:gamma_pdf}
+f(y; \alpha, \theta) = \frac{1}{\Gamma(\alpha)\theta^\alpha} y^{\alpha-1} \exp\left(-\frac{y}{\theta}\right)
+\end{equation}
+
+The first two moments are:
+\begin{equation} \label{eq:moments}
+\mathrm{E}[Y] = \mu = \alpha\theta, \quad \mathrm{Var}(Y) = \alpha\theta^2 = \frac{\mu^2}{\alpha}
+\end{equation}
+
+In a GLM context with dispersion parameter $\phi$ and prior weights $w_{k,j}$, the variance is specified as $\mathrm{Var}(Y_{k,j}) = \frac{\phi \mu_{k,j}^2}{w_{k,j}}$. Equating this with the Gamma variance in (\ref{eq:moments}) allows us to define the shape and scale parameters in terms of GLM inputs:
+\begin{equation} \label{eq:shape_param}
+\alpha_{k,j} = \frac{w_{k,j}}{\phi}
+\end{equation}
+\begin{equation} \label{eq:scale_param}
+\theta_{k,j} = \frac{\mu_{k,j}}{\alpha_{k,j}} = \frac{\mu_{k,j} \phi}{w_{k,j}}
+\end{equation}
+
+\section{Maximum Likelihood Estimation}
+
+The log-likelihood $\mathcal{L}$ is the sum of the logs of the individual densities over all observations. Substituting (\ref{eq:gamma_pdf}):
+\begin{equation} \label{eq:loglik_1}
+\mathcal{L} = \sum_{k,j} \left[ (\alpha_{k,j} - 1)\ln y_{k,j} - \frac{y_{k,j}}{\theta_{k,j}} - \alpha_{k,j} \ln \theta_{k,j} - \ln \Gamma(\alpha_{k,j}) \right]
+\end{equation}
+
+We focus on terms involving the mean $\mu$ (and therefore $\beta$), grouping others into a constant $C$. Substituting $\alpha_{k,j}$ and $\theta_{k,j}$ from (\ref{eq:shape_param}) and (\ref{eq:scale_param}):
+\begin{equation} \label{eq:loglik_2}
+\mathcal{L} \propto \sum_{k,j} \left[ - \frac{y_{k,j} w_{k,j}}{\mu_{k,j} \phi} - \frac{w_{k,j}}{\phi} \ln \left( \frac{\mu_{k,j} \phi}{w_{k,j}} \right) \right]
+\end{equation}
+
+Substituting $\mu_{k,j} = 1/\beta_j$ (from (\ref{eq:mean_beta})):
+\begin{equation} \label{eq:loglik_beta}
+\mathcal{L}(\beta) = \frac{1}{\phi} \sum_{j} \sum_{k \in \mathcal{S}_j} \left[ - w_{k,j} y_{k,j} \beta_j + w_{k,j} \ln \beta_j \right] + C
+\end{equation}
+
+\subsection{The Score Equation}
+To maximize the likelihood, we take the partial derivative with respect to $\beta_j$:
+\begin{equation} \label{eq:score_deriv}
+\frac{\partial \mathcal{L}}{\partial \beta_j} = \frac{1}{\phi} \sum_{k \in \mathcal{S}_j} \left[ - w_{k,j} y_{k,j} + \frac{w_{k,j}}{\beta_j} \right]
+\end{equation}
+
+Setting the score equation to zero to solve for the estimator $\hat{\beta}_j$:
+\begin{equation} \label{eq:score_zero}
+\sum_{k \in \mathcal{S}_j} \left( - w_{k,j} y_{k,j} + \frac{w_{k,j}}{\hat{\beta}_j} \right) = 0
+\end{equation}
+
+Rearranging terms:
+\begin{equation} \label{eq:score_rearranged}
+\frac{1}{\hat{\beta}_j} \sum_{k \in \mathcal{S}_j} w_{k,j} = \sum_{k \in \mathcal{S}_j} w_{k,j} y_{k,j}
+\end{equation}
+
+Recalling that the predicted mean $\hat{\mu}_j = 1/\hat{\beta}_j$:
+\begin{equation} \label{eq:mu_hat}
+\hat{\mu}_j = \frac{\sum_{k \in \mathcal{S}_j} w_{k,j} y_{k,j}}{\sum_{k \in \mathcal{S}_j} w_{k,j}}
+\end{equation}
+
+\section{Equivalence Proof}
+
+We now substitute the definitions from Section 2 back into (\ref{eq:mu_hat}).
+Recall that $y_{k,j} = C_{k,j+1} / C_{k,j}$ and weights $w_{k,j} = C_{k,j}$.
+
+The numerator becomes:
+\begin{equation} \label{eq:numerator}
+\sum_{k \in \mathcal{S}_j} w_{k,j} y_{k,j} = \sum_{k \in \mathcal{S}_j} C_{k,j} \left( \frac{C_{k,j+1}}{C_{k,j}} \right) = \sum_{k \in \mathcal{S}_j} C_{k,j+1}
+\end{equation}
+
+The denominator becomes:
+\begin{equation} \label{eq:denominator}
+\sum_{k \in \mathcal{S}_j} w_{k,j} = \sum_{k \in \mathcal{S}_j} C_{k,j}
+\end{equation}
+
+Substituting (\ref{eq:numerator}) and (\ref{eq:denominator}) into (\ref{eq:mu_hat}):
+\begin{equation} \label{eq:final_result}
+\hat{\mu}_j = \frac{\sum_{k \in \mathcal{S}_j} C_{k,j+1}}{\sum_{k \in \mathcal{S}_j} C_{k,j}}
+\end{equation}
+
+Comparing (\ref{eq:final_result}) with the standard Chain Ladder estimator in (\ref{eq:cl_estimator}), we see they are identical. Furthermore, since $\hat{\eta}_j = \hat{\beta}_j = 1/\hat{\mu}_j$:
+\begin{equation} \label{eq:beta_result}
+\hat{\beta}_j = \left( \frac{\sum_{k \in \mathcal{S}_j} C_{k,j+1}}{\sum_{k \in \mathcal{S}_j} C_{k,j}} \right)^{-1} = \frac{1}{\hat{f}_j}
+\end{equation}
+
+\section{Conclusion}
+This proof demonstrates that minimizing the deviance of a Gamma GLM with an inverse link function and weights equal to cumulative claims results in coefficient estimates $\hat{\beta}_j$ that correspond exactly to the inverse of the volume-weighted Chain Ladder factors. Consequently, the predicted values from this GLM match the Chain Ladder projections exactly.
+
+\end{document}

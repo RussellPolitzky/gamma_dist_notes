@@ -1,0 +1,687 @@
+#LyX file created by tex2lyx 2.4
+\lyxformat 620
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin C:/srce/russell/chain_ladder_with_gamma_response_proof/
+\textclass article
+\begin_preamble
+
+
+\title{Proof: Equivalence of Gamma GLM and Volume-Weighted Chain Ladder}
+\author{}
+
+
+
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children no
+\language english
+\language_package none
+\inputencoding utf8
+\fontencoding default
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_roman_osf false
+\font_sans_osf false
+\font_typewriter_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date true
+\justification true
+\use_refstyle 0
+\use_minted 0
+\use_lineno false
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\change_bars false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\docbook_table_output 0
+\docbook_mathml_prefix 1
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+maketitle
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+This document provides a rigorous proof that a Generalized Linear Model (GLM) configured with a Gamma error distribution, an inverse link function, and weights equal to the cumulative claims at the start of the development period yields parameter estimates that exactly match the standard volume-weighted Chain Ladder development factors.
+\end_layout
+
+\begin_layout Section
+Model Definitions and Notation
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $C_{k,j}$
+\end_inset
+
+ denote the cumulative claims for origin year 
+\begin_inset Formula $k$
+\end_inset
+
+ and development period 
+\begin_inset Formula $j$
+\end_inset
+
+. We define the incremental development factor (individual link ratio) as the response variable 
+\begin_inset Formula $Y_{k,j}$
+\end_inset
+
+: 
+\begin_inset Formula \begin{equation} \label{eq:response}
+Y_{k,j} = \frac{C_{k,j+1}}{C_{k,j}}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The standard volume-weighted Chain Ladder estimator for the age-to-age factor 
+\begin_inset Formula $f_j$
+\end_inset
+
+ is given by: 
+\begin_inset Formula \begin{equation} \label{eq:cl_estimator}
+\hat{f}_j = \frac{\sum_{k \in \mathcal{S}_j} C_{k,j+1}}{\sum_{k \in \mathcal{S}_j} C_{k,j}}
+\end{equation}
+\end_inset
+
+where 
+\begin_inset Formula $\mathcal{S}_j$
+\end_inset
+
+ is the set of observed origin years for development period 
+\begin_inset Formula $j$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+GLM Specification
+\end_layout
+
+\begin_layout Standard
+We construct a GLM with the following components: 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Distribution:
+\series default
+ Gamma. 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Link Function:
+\series default
+ Inverse. 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Predictors:
+\series default
+ Development period 
+\begin_inset Formula $j$
+\end_inset
+
+ is treated as a categorical factor. 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Weights:
+\series default
+ Prior cumulative claims, 
+\begin_inset Formula $w_{k,j} = C_{k,j}$
+\end_inset
+
+. 
+\end_layout
+
+\begin_layout Subsection
+The Linear Response
+\end_layout
+
+\begin_layout Standard
+The linear response (or linear predictor), denoted as 
+\begin_inset Formula $\eta$
+\end_inset
+
+, is modeled as a function of the development period only. Since development period is categorical, we assign a separate coefficient 
+\begin_inset Formula $\beta_j$
+\end_inset
+
+ for each period: 
+\begin_inset Formula \begin{equation} \label{eq:linear_response}
+\eta_{k,j} = \beta_j
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+The Link Function
+\end_layout
+
+\begin_layout Standard
+The link function 
+\begin_inset Formula $g(\cdot)$
+\end_inset
+
+ connects the expected value of the response, 
+\begin_inset Formula $\mu_{k,j} = \mathrm{E}[Y_{k,j}]$
+\end_inset
+
+, to the linear response 
+\begin_inset Formula $\eta_{k,j}$
+\end_inset
+
+. For the inverse link: 
+\begin_inset Formula \begin{equation} \label{eq:link_func}
+\eta_{k,j} = g(\mu_{k,j}) = \frac{1}{\mu_{k,j}}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Combining (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linear_response"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:link_func"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+), we can express the mean in terms of the coefficients: 
+\begin_inset Formula \begin{equation} \label{eq:mean_beta}
+\mu_{k,j} = \frac{1}{\beta_j}
+\end{equation}
+\end_inset
+
+Note that 
+\begin_inset Formula $\mu_{k,j}$
+\end_inset
+
+ depends only on 
+\begin_inset Formula $j$
+\end_inset
+
+, so we may write 
+\begin_inset Formula $\mu_j$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Gamma Distribution Parameterization
+\end_layout
+
+\begin_layout Standard
+We utilize the Shape (
+\begin_inset Formula $\alpha$
+\end_inset
+
+) and Scale (
+\begin_inset Formula $\theta$
+\end_inset
+
+) parameterization of the Gamma probability density function. For a random variable 
+\begin_inset Formula $Y \sim \text{Gamma}(\alpha, \theta)$
+\end_inset
+
+: 
+\begin_inset Formula \begin{equation} \label{eq:gamma_pdf}
+f(y; \alpha, \theta) = \frac{1}{\Gamma(\alpha)\theta^\alpha} y^{\alpha-1} \exp\left(-\frac{y}{\theta}\right)
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The first two moments are: 
+\begin_inset Formula \begin{equation} \label{eq:moments}
+\mathrm{E}[Y] = \mu = \alpha\theta, \quad \mathrm{Var}(Y) = \alpha\theta^2 = \frac{\mu^2}{\alpha}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In a GLM context with dispersion parameter 
+\begin_inset Formula $\phi$
+\end_inset
+
+ and prior weights 
+\begin_inset Formula $w_{k,j}$
+\end_inset
+
+, the variance is specified as 
+\begin_inset Formula $\mathrm{Var}(Y_{k,j}) = \frac{\phi \mu_{k,j}^2}{w_{k,j}}$
+\end_inset
+
+. Equating this with the Gamma variance in (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:moments"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) allows us to define the shape and scale parameters in terms of GLM inputs: 
+\begin_inset Formula \begin{equation} \label{eq:shape_param}
+\alpha_{k,j} = \frac{w_{k,j}}{\phi}
+\end{equation}
+\end_inset
+
+
+\begin_inset Formula \begin{equation} \label{eq:scale_param}
+\theta_{k,j} = \frac{\mu_{k,j}}{\alpha_{k,j}} = \frac{\mu_{k,j} \phi}{w_{k,j}}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Maximum Likelihood Estimation
+\end_layout
+
+\begin_layout Standard
+The log-likelihood 
+\begin_inset Formula $\mathcal{L}$
+\end_inset
+
+ is the sum of the logs of the individual densities over all observations. Substituting (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:gamma_pdf"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+): 
+\begin_inset Formula \begin{equation} \label{eq:loglik_1}
+\mathcal{L} = \sum_{k,j} \left[ (\alpha_{k,j} - 1)\ln y_{k,j} - \frac{y_{k,j}}{\theta_{k,j}} - \alpha_{k,j} \ln \theta_{k,j} - \ln \Gamma(\alpha_{k,j}) \right]
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We focus on terms involving the mean 
+\begin_inset Formula $\mu$
+\end_inset
+
+ (and therefore 
+\begin_inset Formula $\beta$
+\end_inset
+
+), grouping others into a constant 
+\begin_inset Formula $C$
+\end_inset
+
+. Substituting 
+\begin_inset Formula $\alpha_{k,j}$
+\end_inset
+
+ and 
+\begin_inset Formula $\theta_{k,j}$
+\end_inset
+
+ from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:shape_param"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:scale_param"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+): 
+\begin_inset Formula \begin{equation} \label{eq:loglik_2}
+\mathcal{L} \propto \sum_{k,j} \left[ - \frac{y_{k,j} w_{k,j}}{\mu_{k,j} \phi} - \frac{w_{k,j}}{\phi} \ln \left( \frac{\mu_{k,j} \phi}{w_{k,j}} \right) \right]
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Substituting 
+\begin_inset Formula $\mu_{k,j} = 1/\beta_j$
+\end_inset
+
+ (from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:mean_beta"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+)): 
+\begin_inset Formula \begin{equation} \label{eq:loglik_beta}
+\mathcal{L}(\beta) = \frac{1}{\phi} \sum_{j} \sum_{k \in \mathcal{S}_j} \left[ - w_{k,j} y_{k,j} \beta_j + w_{k,j} \ln \beta_j \right] + C
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+The Score Equation
+\end_layout
+
+\begin_layout Standard
+To maximize the likelihood, we take the partial derivative with respect to 
+\begin_inset Formula $\beta_j$
+\end_inset
+
+: 
+\begin_inset Formula \begin{equation} \label{eq:score_deriv}
+\frac{\partial \mathcal{L}}{\partial \beta_j} = \frac{1}{\phi} \sum_{k \in \mathcal{S}_j} \left[ - w_{k,j} y_{k,j} + \frac{w_{k,j}}{\beta_j} \right]
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Setting the score equation to zero to solve for the estimator 
+\begin_inset Formula $\hat{\beta}_j$
+\end_inset
+
+: 
+\begin_inset Formula \begin{equation} \label{eq:score_zero}
+\sum_{k \in \mathcal{S}_j} \left( - w_{k,j} y_{k,j} + \frac{w_{k,j}}{\hat{\beta}_j} \right) = 0
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Rearranging terms: 
+\begin_inset Formula \begin{equation} \label{eq:score_rearranged}
+\frac{1}{\hat{\beta}_j} \sum_{k \in \mathcal{S}_j} w_{k,j} = \sum_{k \in \mathcal{S}_j} w_{k,j} y_{k,j}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Recalling that the predicted mean 
+\begin_inset Formula $\hat{\mu}_j = 1/\hat{\beta}_j$
+\end_inset
+
+: 
+\begin_inset Formula \begin{equation} \label{eq:mu_hat}
+\hat{\mu}_j = \frac{\sum_{k \in \mathcal{S}_j} w_{k,j} y_{k,j}}{\sum_{k \in \mathcal{S}_j} w_{k,j}}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Equivalence Proof
+\end_layout
+
+\begin_layout Standard
+We now substitute the definitions from Section 2 back into (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:mu_hat"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+). Recall that 
+\begin_inset Formula $y_{k,j} = C_{k,j+1} / C_{k,j}$
+\end_inset
+
+ and weights 
+\begin_inset Formula $w_{k,j} = C_{k,j}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The numerator becomes: 
+\begin_inset Formula \begin{equation} \label{eq:numerator}
+\sum_{k \in \mathcal{S}_j} w_{k,j} y_{k,j} = \sum_{k \in \mathcal{S}_j} C_{k,j} \left( \frac{C_{k,j+1}}{C_{k,j}} \right) = \sum_{k \in \mathcal{S}_j} C_{k,j+1}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The denominator becomes: 
+\begin_inset Formula \begin{equation} \label{eq:denominator}
+\sum_{k \in \mathcal{S}_j} w_{k,j} = \sum_{k \in \mathcal{S}_j} C_{k,j}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Substituting (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:numerator"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:denominator"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) into (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:mu_hat"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+): 
+\begin_inset Formula \begin{equation} \label{eq:final_result}
+\hat{\mu}_j = \frac{\sum_{k \in \mathcal{S}_j} C_{k,j+1}}{\sum_{k \in \mathcal{S}_j} C_{k,j}}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Comparing (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:final_result"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) with the standard Chain Ladder estimator in (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:cl_estimator"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+), we see they are identical. Furthermore, since 
+\begin_inset Formula $\hat{\eta}_j = \hat{\beta}_j = 1/\hat{\mu}_j$
+\end_inset
+
+: 
+\begin_inset Formula \begin{equation} \label{eq:beta_result}
+\hat{\beta}_j = \left( \frac{\sum_{k \in \mathcal{S}_j} C_{k,j+1}}{\sum_{k \in \mathcal{S}_j} C_{k,j}} \right)^{-1} = \frac{1}{\hat{f}_j}
+\end{equation}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+This proof demonstrates that minimizing the deviance of a Gamma GLM with an inverse link function and weights equal to cumulative claims results in coefficient estimates 
+\begin_inset Formula $\hat{\beta}_j$
+\end_inset
+
+ that correspond exactly to the inverse of the volume-weighted Chain Ladder factors. Consequently, the predicted values from this GLM match the Chain Ladder projections exactly.
+\end_layout
+
+\end_body
+\end_document

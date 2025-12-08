@@ -1,0 +1,120 @@
+---
+title: "Gamma GLM and Chain Ladder Equivalence"
+author: "Generated from JSON Response"
+format: html
+embed-resources: true
+---
+
+# Rigorous Proof: GLM with Gamma Distribution Matches Volume-Weighted Chain Ladder
+
+## 1. Model Setup and Notation
+We define the following:
+
+- **Response Variable**: $Y_{k,j} = \frac{C_{k,j}}{C_{k,j-1}}$ (the ratio of cumulative claims from development period $j-1$ to $j$ for origin year $k$).
+- **Weights**: $w_{k,j} = C_{k,j-1}$ (cumulative claims at the start of development period $j$).
+- **Linear Predictor**: $\eta_{k,j} = \beta_j$, where $\beta_j$ is the coefficient for development period $j$ (treated as a categorical variable).
+- **Link Function**: Inverse, so $\eta_{k,j} = \frac{1}{\mu_{k,j}}$, where $\mu_{k,j} = E[Y_{k,j}]$.
+- **Distribution**: $Y_{k,j} \sim \text{Gamma}(\alpha_j, \theta_j)$, where:
+  - Shape parameter $\alpha_j = \frac{1}{\phi}$ (constant for all $j$),
+  - Scale parameter $\theta_j = \phi \mu_{k,j}$,
+  - Variance $\mathrm{Var}(Y_{k,j}) = \phi \mu_{k,j}^2$.
+
+## 2. Gamma Distribution Likelihood
+The probability density function (PDF) of $Y_{k,j}$ is:
+
+$$
+f(Y_{k,j}; \alpha_j, \theta_j) = \frac{Y_{k,j}^{\alpha_j - 1} e^{-Y_{k,j}/\theta_j}}{\theta_j^{\alpha_j} \, \Gamma(\alpha_j)}.
+$$
+
+Given $\theta_j = \phi \mu_{k,j}$ and $\mu_{k,j} = 1/\beta_j$, rewrite the PDF as:
+
+$$
+f(Y_{k,j}; \alpha_j, \beta_j) = \frac{Y_{k,j}^{\alpha_j - 1} e^{-\beta_j Y_{k,j}/\phi}}{(\phi/\beta_j)^{\alpha_j} \, \Gamma(\alpha_j)}.
+$$
+
+## 3. Log-Likelihood Function
+The weighted log-likelihood is:
+
+$$
+\ell(\beta_j, \phi) = \sum_{k,j} w_{k,j} \left[
+(\alpha_j - 1) \log Y_{k,j}
+- \frac{\beta_j Y_{k,j}}{\phi}
+- \alpha_j \log\left(\frac{\phi}{\beta_j}\right)
+- \log \Gamma(\alpha_j)
+\right].
+$$
+
+Dropping terms not involving $\beta_j$:
+
+$$
+\ell(\beta_j) = \sum_{k,j} w_{k,j} \left(-\frac{\beta_j Y_{k,j}}{\phi} + \alpha_j \log \beta_j\right).
+$$
+
+## 4. Score Equation for $\beta_j$
+Differentiate:
+
+$$
+\frac{\partial \ell}{\partial \beta_j}
+= \sum_k w_{k,j} \left(-\frac{Y_{k,j}}{\phi} + \frac{\alpha_j}{\beta_j}\right) = 0.
+$$
+
+With $\alpha_j = \frac{1}{\phi}$:
+
+$$
+\sum_k w_{k,j} \left(-Y_{k,j} + \frac{1}{\beta_j}\right) = 0.
+$$
+
+## 5. Solving for $\beta_j$
+Rearranging:
+
+$$
+\sum_k w_{k,j} Y_{k,j} = \frac{1}{\beta_j} \sum_k w_{k,j}.
+$$
+
+Substitute $w_{k,j} = C_{k,j-1}$ and $Y_{k,j} = C_{k,j}/C_{k,j-1}$:
+
+$$
+\sum_k C_{k,j} = \frac{1}{\beta_j} \sum_k C_{k,j-1}.
+$$
+
+Thus:
+
+$$
+\beta_j = \frac{\sum_k C_{k,j-1}}{\sum_k C_{k,j}}.
+$$
+
+## 6. Connection to Chain Ladder
+The volume-weighted chain ladder development factor is:
+
+$$
+F_j = \frac{\sum_k C_{k,j}}{\sum_k C_{k,j-1}}.
+$$
+
+Thus:
+
+$$
+\beta_j = \frac{1}{F_j}.
+$$
+
+## 7. Predicted Values
+GLM predictions satisfy:
+
+$$
+\hat{Y}_{k,j} = \frac{1}{\beta_j} = F_j.
+$$
+
+Therefore projected cumulative claims are:
+
+$$
+\hat{C}_{k,j} = C_{k,j-1} \cdot F_j,
+$$
+
+which matches the chain ladder exactly.
+
+# Conclusion
+A Gamma GLM with an inverse link, weights $C_{k,j-1}$, and development period as a factor yields:
+
+- Coefficients $\beta_j = 1/F_j$,
+- Predicted means equal to the chain-ladder development factors.
+
+Thus, this GLM formulation exactly reproduces the classical volume-weighted chain ladder method.

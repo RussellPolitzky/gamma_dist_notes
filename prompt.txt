@@ -7,6 +7,10 @@ When using:
     estimate for each development period 
 3.) The inverse link function with 
 4.) The claims reserved at the start of each development period as weights
+5.) Use k to signify the origin year and j for the development period.  K ranges from 1 to K and 
+j from 1 to J.
+
+The proof must be based on the shape and scale parameterization of the Gamma distribution.
 
 The coefficient values obtained from the development factor samples using the GLM method as formulated 
 above, are found to match 1/(volume weighted values), obtained using the basic chain ladder method, exactly.  
@@ -15,3 +19,5 @@ values exactly.
 
 Construct a rigorous proof, showing that this formulation of the chain ladder problem provides an 
 exact match for the volume weighted chain ladder, development factor estimates.
+
+

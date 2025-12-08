@@ -1,0 +1,138 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+
+\begin{document}
+
+\title{Gamma GLM Proof (Shape--Scale Parameterization) for the Chain Ladder Factor}
+\author{}
+\date{}
+\maketitle
+
+\section{Original Problem Statement}
+
+Consider a single development period $j$ in a chain--ladder setting. For each origin period $k=1,\dots,n$ let
+\[
+Y_k \equiv \frac{C_{k,j+1}}{C_{k,j}}, \qquad w_k \equiv C_{k,j},
+\]
+where $C_{k,j}$ denotes the opening cumulative claims at development $j$.
+
+We fit a Gamma GLM with:
+\begin{itemize}
+  \item Response $Y_k$,
+  \item Prior weights $w_k$,
+  \item Inverse link $g(\mu_k)=1/\mu_k=\eta_k$,
+  \item Intercept-only predictor for column $j$: $\eta_k=\beta_j$, hence $\mu_k\equiv\mu_j$ for all $k$ in column $j$.
+\end{itemize}
+
+\emph{Goal:} Show that the MLE of the mean factor $\mu_j$ equals the volume-weighted chain--ladder development factor:
+\[
+\widehat{\mu}_j \;=\; \frac{\sum_{k=1}^n C_{k,j+1}}{\sum_{k=1}^n C_{k,j}}
+ \;=\; \frac{\sum_{k=1}^n w_k\,Y_k}{\sum_{k=1}^n w_k}.
+\]
+
+\section{Rigorous Proof (Using Index $k$)}
+
+\subsection{Definitions and Notation}
+
+Under the inverse-link, intercept-only specification for column $j$,
+\[
+\mu_k = \mu_j \quad (\text{constant in }k),
+\]
+and we assume a common dispersion parameter $\phi>0$ for the Gamma GLM.
+
+Gamma(shape--scale) parameterization:
+\[
+f(y;\alpha,\theta) = \frac{y^{\alpha-1}e^{-y/\theta}}{\Gamma(\alpha)\,\theta^{\alpha}}, \qquad
+\mathbb{E}[Y] = \alpha\theta,\qquad \operatorname{Var}(Y)=\alpha\theta^2.
+\]
+
+\subsection{Embedding Prior Weights in Shape--Scale Form}
+
+In a Gamma GLM with prior weights $w_k$, the working variance is
+\[
+\operatorname{Var}(Y_k) = \frac{\phi\,\mu_k^2}{w_k}.
+\]
+To express this exactly using per-observation Gamma parameters $(\alpha_k,\theta_k)$, match moments:
+\[
+\alpha_k\theta_k = \mu_k,\qquad \alpha_k\theta_k^2 = \frac{\phi\,\mu_k^2}{w_k}.
+\]
+Dividing the second by the first,
+\[
+\theta_k = \frac{\phi\,\mu_k}{w_k}, \qquad
+\alpha_k = \frac{\mu_k}{\theta_k} = \frac{w_k}{\phi}.
+\]
+Since $\mu_k\equiv\mu_j$ for column $j$,
+\begin{equation}
+\boxed{\;\alpha_k = \frac{w_k}{\phi}, \qquad \theta_k = \frac{\phi\,\mu_j}{w_k}\;}
+\label{eq:shape-scale-mapping}
+\end{equation}
+with $\alpha_k>0$ and $\theta_k>0$ whenever $w_k>0$ and $\mu_j>0$.
+
+\subsection{Gamma Log-Likelihood (Shape--Scale)}
+
+Given independent observations $y_k$ of $Y_k$, the log-likelihood under $f(y;\alpha,\theta)$ is
+\begin{align*}
+\ell(\mu_j)
+&= \sum_{k=1}^n \left\{ (\alpha_k-1)\ln y_k \;-\; \frac{y_k}{\theta_k}
+\;-\; \alpha_k\ln\theta_k \;-\; \ln\Gamma(\alpha_k) \right\}.
+\end{align*}
+Substitute \eqref{eq:shape-scale-mapping}:
+\[
+-\frac{y_k}{\theta_k} = -\frac{y_k w_k}{\phi\,\mu_j},\qquad
+-\alpha_k\ln\theta_k = -\frac{w_k}{\phi}\ln\!\left(\frac{\phi\,\mu_j}{w_k}\right)
+= -\frac{w_k}{\phi}\big(\ln\phi + \ln\mu_j - \ln w_k\big).
+\]
+Terms independent of $\mu_j$ can be dropped when maximizing in $\mu_j$. Thus, up to an additive constant,
+\begin{equation}
+\ell(\mu_j) \;\dot=\; -\frac{1}{\phi}\sum_{k=1}^n\left( \frac{w_k\,y_k}{\mu_j} + w_k\ln\mu_j \right).
+\label{eq:reduced-likelihood}
+\end{equation}
+
+\subsection{Score Equation and MLE}
+
+Differentiate \eqref{eq:reduced-likelihood} with respect to $\mu_j$:
+\[
+\frac{\partial \ell}{\partial \mu_j}
+\;\dot=\; -\frac{1}{\phi}\sum_{k=1}^n\left( -\frac{w_k\,y_k}{\mu_j^2} + \frac{w_k}{\mu_j} \right).
+\]
+Set the score to zero and multiply by $\mu_j^2$:
+\[
+-\sum_{k=1}^n w_k\,y_k + \mu_j\sum_{k=1}^n w_k = 0
+\quad\Longrightarrow\quad
+\boxed{\;\widehat{\mu}_j = \frac{\sum_{k=1}^n w_k\,y_k}{\sum_{k=1}^n w_k}\;}.
+\]
+
+\subsection{Final Substitution (Chain--Ladder Identity)}
+
+With $y_k = Y_k = C_{k,j+1}/C_{k,j}$ and $w_k=C_{k,j}$,
+\[
+\sum_{k=1}^n w_k\,y_k = \sum_{k=1}^n C_{k,j}\cdot \frac{C_{k,j+1}}{C_{k,j}} = \sum_{k=1}^n C_{k,j+1},
+\qquad
+\sum_{k=1}^n w_k = \sum_{k=1}^n C_{k,j}.
+\]
+Hence
+\[
+\widehat{\mu}_j = \frac{\sum_{k=1}^n C_{k,j+1}}{\sum_{k=1}^n C_{k,j}},
+\]
+which matches the volume-weighted chain--ladder development factor exactly.
+
+\section{Checks and Remarks}
+
+\begin{itemize}
+  \item The mapping $(\alpha_k,\theta_k)$ in \eqref{eq:shape-scale-mapping} ensures $\mathbb{E}[Y_k]=\mu_j$ and $\operatorname{Var}(Y_k)=\phi\mu_j^2/w_k$, i.e., the standard Gamma GLM variance with prior weights.
+  \item In the score, the dispersion $\phi$ cancels, so $\widehat{\mu}_j$ is unaffected by $\phi$ at the MLE stage for $\mu_j$.
+  \item The result is identical to the derivation using the canonical parameterization; here it is obtained directly from the shape--scale Gamma pdf
+        $f(y;\alpha,\theta)=y^{\alpha-1}e^{-y/\theta}/(\Gamma(\alpha)\theta^\alpha)$.
+\end{itemize}
+
+\begin{flushright}
+\(\square\)
+\end{flushright}
+
+\end{document}

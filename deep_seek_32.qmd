@@ -1,0 +1,143 @@
+---
+title: "Equivalence of Gamma GLM and Volume-Weighted Chain Ladder"
+author: "Actuarial Proof"
+format: html
+engine: knitr
+toc: true
+toc-depth: 2
+number-sections: true
+---
+
+# Abstract
+
+This document provides a rigorous proof that a specific Gamma GLM formulation exactly reproduces the volume-weighted chain ladder development factor estimates. The proof demonstrates the mathematical equivalence between the two approaches.
+
+# Notation and Setup
+
+Let $C_{k,j}$ denote the cumulative claims amount for origin period $k = 1,\dots,K$ and development period $j = 0,\dots,J$, where $C_{k,0}$ represents the initial cumulative claims.
+
+For each development period $j \ge 1$, define the individual development ratio:
+
+$$
+Y_{k,j} = \frac{C_{k,j}}{C_{k,j-1}}, \qquad k = 1,\dots,K-j+1, \tag{1}
+$$
+
+where the upper limit on $k$ ensures both $C_{k,j-1}$ and $C_{k,j}$ are observed.
+
+The **volume-weighted chain ladder development factor** for period $j$ is:
+
+$$
+f_j = \frac{\sum_{k=1}^{K-j+1} C_{k,j}}{\sum_{k=1}^{K-j+1} C_{k,j-1}}. \tag{2}
+$$
+
+# GLM Specification
+
+We model the response $Y_{k,j}$ using a Gamma distribution with mean $\mu_j$ and constant shape parameter $\nu$. The mean depends only on the development period $j$ via an **inverse link function**:
+
+$$
+g(\mu_j) = \frac{1}{\mu_j} = \eta_j, \tag{3}
+$$
+
+where the linear predictor $\eta_j = \beta_j$ is the coefficient for development period $j$ (treated as a categorical variable without intercept).
+
+The model uses **weights** equal to the claims amount at the beginning of each development period:
+
+$$
+w_{k,j} = C_{k,j-1}. \tag{4}
+$$
+
+Observations are assumed independent.
+
+# Proof of Equivalence
+
+## Log-Likelihood and Estimating Equations
+
+Ignoring constants, the weighted log-likelihood for the Gamma GLM is:
+
+$$
+\ell = \sum_{j=1}^{J} \sum_{k=1}^{K-j+1} w_{k,j} \left[ -\nu \frac{Y_{k,j}}{\mu_j} - \nu \log \mu_j \right]. \tag{5}
+$$
+
+Since the means $\mu_j$ are separate for each $j$, we can consider the contribution for a fixed $j$:
+
+$$
+\ell_j = -\nu \sum_{k=1}^{K-j+1} w_{k,j} \left( \frac{Y_{k,j}}{\mu_j} + \log \mu_j \right). \tag{6}
+$$
+
+Differentiating with respect to $\mu_j$:
+
+$$
+\frac{\partial \ell_j}{\partial \mu_j} = -\nu \sum_{k=1}^{K-j+1} w_{k,j} \left( -\frac{Y_{k,j}}{\mu_j^2} + \frac{1}{\mu_j} \right)
+= \frac{\nu}{\mu_j^2} \sum_{k=1}^{K-j+1} w_{k,j} \left( Y_{k,j} - \mu_j \right). \tag{7}
+$$
+
+Setting the derivative to zero gives the maximum likelihood estimating equation:
+
+$$
+\sum_{k=1}^{K-j+1} w_{k,j} \left( Y_{k,j} - \mu_j \right) = 0. \tag{8}
+$$
+
+## Solution for $\mu_j$
+
+From equation (8), we obtain:
+
+$$
+\mu_j = \frac{\sum_{k=1}^{K-j+1} w_{k,j} Y_{k,j}}{\sum_{k=1}^{K-j+1} w_{k,j}}. \tag{9}
+$$
+
+Now substitute the definitions of $w_{k,j}$ and $Y_{k,j}$ from equations (4) and (1):
+
+$$
+\sum_{k=1}^{K-j+1} w_{k,j} Y_{k,j} = \sum_{k=1}^{K-j+1} C_{k,j-1} \cdot \frac{C_{k,j}}{C_{k,j-1}} = \sum_{k=1}^{K-j+1} C_{k,j}, \tag{10}
+$$
+
+$$
+\sum_{k=1}^{K-j+1} w_{k,j} = \sum_{k=1}^{K-j+1} C_{k,j-1}. \tag{11}
+$$
+
+Therefore:
+
+$$
+\mu_j = \frac{\sum_{k=1}^{K-j+1} C_{k,j}}{\sum_{k=1}^{K-j+1} C_{k,j-1}} = f_j, \tag{12}
+$$
+
+which is exactly the volume-weighted chain ladder development factor defined in equation (2).
+
+## GLM Coefficients
+
+Using the inverse link function $\eta_j = 1/\mu_j$, the estimated GLM coefficient for development period $j$ is:
+
+$$
+\hat{\beta}_j = \hat{\eta}_j = \frac{1}{\hat{\mu}_j} = \frac{1}{f_j}. \tag{13}
+$$
+
+Thus, the GLM coefficients are the **reciprocals** of the chain ladder development factors.
+
+## Predicted Values
+
+For any observation in development period $j$, the fitted mean is $\hat{\mu}_j = f_j$. Hence, for a future cumulative claim given $C_{k,j-1}$, the model predicts:
+
+$$
+\mathbb{E}[C_{k,j} \mid C_{k,j-1}] = C_{k,j-1} \cdot \hat{\mu}_j = C_{k,j-1} \cdot f_j, \tag{14}
+$$
+
+which matches the chain ladder projection exactly.
+
+# Conclusion
+
+The Gamma GLM with:
+
+1. Inverse link function
+2. Development period as a categorical predictor
+3. Weights equal to the claims reserved at the start of each development period
+
+yields coefficient estimates $\hat{\beta}_j = 1/f_j$ and fitted means $\hat{\mu}_j = f_j$, where $f_j$ are the volume-weighted chain ladder development factors. Consequently, this GLM formulation reproduces the deterministic chain ladder forecasts exactly.
+
+# Appendix: Mathematical Summary
+
+| Concept | Chain Ladder | Gamma GLM |
+|---------|--------------|-----------|
+| Development factor | $f_j = \frac{\sum_{k} C_{k,j}}{\sum_{k} C_{k,j-1}}$ | $\hat{\mu}_j = f_j$ |
+| Coefficient | Not applicable | $\hat{\beta}_j = 1/f_j$ |
+| Prediction | $C_{k,j-1} \cdot f_j$ | $C_{k,j-1} \cdot \hat{\mu}_j$ |
+| Weighting | Volume-weighted | $w_{k,j} = C_{k,j-1}$ |
